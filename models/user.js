@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const axios = require('axios');
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -18,4 +17,7 @@ const userSchema = new mongoose.Schema({
   }]
 });
 
-module.exports = UserModel
+// Require Mongoose Model
+const User = mongoose.model('User', userSchema)
+
+module.exports = User
