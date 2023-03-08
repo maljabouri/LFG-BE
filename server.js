@@ -2,9 +2,8 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
-const bcrypt = require('bcrypt')
 // const passport = require('passport')
-const jwt = require('jsonwebtoken')
+// const jwt = require('jsonwebtoken')
 const db = require('./config/db')
 
 
@@ -16,9 +15,10 @@ mongoose.connection.once('open', () => console.log('Connected to MongoDB-LFG'))
 
 
 //Require Route Files
-// const indexRouter = require('./routes/index')
-// const usersRouter = require('./routes/users')
-// const postRouter = require('./routes/posts')
+const User = require('./models/user.js')
+const Match = require('./models/match.js')
+const Conversation = require('./models/conversation.js')
+const Message = require('./models/message.js')
 
 // Instantiate express server object 
 const app = express()
@@ -39,9 +39,26 @@ app.use(cors({ origin: process.env.CLIENT_ORIGIN || `http://localhost:${reactPor
  * 
  * Mount imported Routers
 */
-// app.use(indexRouter);
-// app.use(usersRouter);
-// app.use(postRouter)
+app.use(indexRouter);
+app.use(usersRouter);
+app.use(postRouter)
+
+// const newUser = new User({
+//   name: "Nick Black",
+//   email: "johndoe@example.com",
+//   password: "password",
+//   username: "NickB93",
+//   server: ['EU'],
+//   roles: ["dps"],
+//   content: ["dungeon"],
+// });
+
+// newUser.save().then(() => {
+//   console.log('User created successfully!');
+// }).catch((error) => {
+//   console.error('Failed to create user:', error);
+// });
+
 
 // Ensuring the server is listening to the port
 app.listen(port, () => console.log(`Backend listening on port:${port}`))

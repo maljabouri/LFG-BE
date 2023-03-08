@@ -4,12 +4,18 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
-  nickname: { type: String },
-  server: { type: [String], required: true },
-  roles: { type: [String], required: true },
+  username: { type: String },
+  server: { 
+    type: [String], required: true, 
+    enum: ['EU', 'US']
+  },
+  roles: { 
+    type: [String], required: true,
+    enum: ['tank', 'dps', 'healer']
+  },
   content: [{ 
     type: [String], required: true,
-    enum: ['raid', 'dungeon'], required: true    
+    enum: ['raid', 'dungeon']  
   }],
   matches: [{
     type: mongoose.Schema.Types.ObjectId,
