@@ -12,27 +12,15 @@ const comparePassword = async (password, hash) => {
   return await bcrypt.compare(password, hash);
 };
 
-// Function to authenticate a user by email or username and password
-const authenticateUser = async (emailOrUsername, password) => {
-  const user = await User.findOne({ $or: [{ email: emailOrUsername }, { username: emailOrUsername }] });
+// Function to authenticate a user by username and password
+const authenticateUser = async (username, password) => {
+  const user = await User.findOne({ username });
   if (!user) throw new Error('User not found');
   const passwordMatch = await comparePassword(password, user.password);
   if (!passwordMatch) throw new Error('Invalid password');
   return user;
 };
 
-// // Example usage:
-// const run = async () => {
-//   try {
-//     const emailOrUsername = 'example@example.com'; // or 'example'
-//     const password = 'mypassword';
-//     const user = await authenticateUser(emailOrUsername, password);
-//     console.log('User authenticated:', user);
-//   } catch (err) {
-//     console.error('Authentication failed:', err.message);
-//   }
-// };
-// run();
 
 module.exports = {
   hashPassword,
