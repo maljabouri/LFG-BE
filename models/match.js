@@ -9,6 +9,6 @@ const matchSchema = new mongoose.Schema({
 });
 
 // Require Mongoose Model
-const MatchModel = mongoose.model('Match', matchSchema);
+const Match = mongoose.model('Match', matchSchema);
 
-module.exports = MatchModel;
+module.exports = Match;

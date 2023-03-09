@@ -2,7 +2,6 @@ const express = require('express')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const { hashPassword } = require('../controllers/auth');
-const { authenticateUser } = require('../controllers/auth');
 const User = require('../models/user');
 const router = express.Router()
 const MatchModel = require('../models/match')
@@ -112,6 +111,8 @@ router.patch('/api/users/:username/password', async (req, res) => {
   }
 });
 
+
+// API to delete active user with password authentication
 router.delete('/api/users/me', async (req, res) => {
   const { username, password } = req.body;
 
@@ -141,11 +142,67 @@ router.delete('/api/users/me', async (req, res) => {
     res.sendStatus(204); // Success, no content
   } catch (err) {
     console.error(err);
-    console.log('Error deleting user profile:', err.message);
     res.status(500).json({ error: 'Failed to delete user profile' });
   }  
 });
 
+
+router.get('/api/users/:username/details', async (req, res) => {
+  try {
+    const username = req.params.username;
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const { _id, server, roles, interested_in_roles, content } = user;
+    res.json({ _id, username, server, roles, interested_in_roles, content });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+router.get('/api/users/search/:id', async (req, res) => {
+  try {
+    const currentUser = await User.findById(req.params.id);
+    if (!currentUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Find all users in the same region as the current user
+    const users = await User.find({ server: currentUser.server });
+
+    // Filter out the current user
+    const filteredUsers = users.filter((user) => user._id.toString() !== currentUser._id.toString());
+
+    // Filter out users who don't have at least one role in common with the current user's interests
+    const usersWithCommonRoles = filteredUsers.filter(
+      (user) =>
+        user.interested_in_roles.filter((role) =>
+          currentUser.roles.includes(role)
+        ).length > 0 ||
+        currentUser.interested_in_roles.filter((role) =>
+          user.roles.includes(role)
+        ).length > 0
+    );
+
+    // Filter out users whose content doesn't overlap with the current user's content
+    const usersWithMatchingContent = usersWithCommonRoles.filter(
+      (user) =>
+        user.content.some((contentItem) =>
+          currentUser.content.includes(contentItem)
+        ) ||
+        currentUser.content.some((contentItem) =>
+          user.content.includes(contentItem)
+        )
+    );
+
+    res.json(usersWithMatchingContent);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to search for users' });
+  }
+});
 
 
 

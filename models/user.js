@@ -16,13 +16,17 @@ const userSchema = new mongoose.Schema({
     type: [String], required: true,
     enum: ['tank', 'dps', 'healer']    
   },
-  content: [{ 
+  content: { 
     type: [String], required: true,
     enum: ['raid', 'dungeon']  
-  }],
+  },
   matches: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Match'
+  }],
+  liked_users: [{
+    type: mongoose.Schema.types.ObjectId,
+    ref: 'User'
   }]
 });
 
