@@ -12,6 +12,10 @@ const userSchema = new mongoose.Schema({
     type: [String], required: true,
     enum: ['tank', 'dps', 'healer']
   },
+  interested_in_roles: {
+    type: [String], required: true,
+    enum: ['tank', 'dps', 'healer']    
+  },
   content: [{ 
     type: [String], required: true,
     enum: ['raid', 'dungeon']  
