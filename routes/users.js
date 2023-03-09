@@ -18,6 +18,7 @@ router.post('/api/register', async (req, res) => {
 
     // Save user to database
     const savedUser = await user.save();
+    
 
     res.status(201).json(savedUser);
   } catch (err) {
@@ -65,5 +66,22 @@ router.get('/api/users/:username', async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+
+
+router.put('/api/users/:username/preferences', (req, res) => {
+  const { server, roles, content, interested_in_roles } = req.body
+  const username = req.params.username;
+
+  // Update user preferences in database
+  User.findOneAndUpdate({ username }, { server, roles, content, interested_in_roles }, { new: true })
+    .then(updatedUser => {
+      res.status(200).json(updatedUser);
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to update user preferences' });
+    });
+});
+
 
 module.exports = router;
