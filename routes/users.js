@@ -83,5 +83,35 @@ router.put('/api/users/:username/preferences', (req, res) => {
     });
 });
 
+router.patch('/api/users/:username/password', async (req, res) => {
+  const { username } = req.params;
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    // Find user by username
+    const user = await User.findOne({ username }).select('+password');
+
+    // Verify current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Invalid current password' });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update user password in database
+    await User.findByIdAndUpdate(user._id, { password: hashedPassword });
+
+    res.sendStatus(204); // Success, no content
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update user password' });
+  }
+});
+
+
+
 
 module.exports = router;
