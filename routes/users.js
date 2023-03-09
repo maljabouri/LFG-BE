@@ -5,6 +5,7 @@ const { hashPassword } = require('../controllers/auth');
 const { authenticateUser } = require('../controllers/auth');
 const User = require('../models/user');
 const router = express.Router()
+const MatchModel = require('../models/match')
 
 router.post('/api/register', async (req, res) => {
   try {
@@ -110,6 +111,42 @@ router.patch('/api/users/:username/password', async (req, res) => {
     res.status(500).json({ error: 'Failed to update user password' });
   }
 });
+
+router.delete('/api/users/me', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // Find user by username
+    const user = await User.findOne({ username }).select('+password');
+
+    // Verify password
+    if (!user) {
+      return res.status(400).json({ error: 'User not found' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Invalid password' });
+    }
+
+    // Delete user from database
+    await User.findOneAndDelete({ username });
+
+    // Remove user's ID from matches they were in
+    await MatchModel.updateMany(
+      { users: user._id },
+      { $pull: { users: user._id } }
+    );
+
+    res.sendStatus(204); // Success, no content
+  } catch (err) {
+    console.error(err);
+    console.log('Error deleting user profile:', err.message);
+    res.status(500).json({ error: 'Failed to delete user profile' });
+  }  
+});
+
+
 
 
 
