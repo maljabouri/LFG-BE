@@ -25,6 +25,29 @@ router.get('/api/users/matches/:id', async (req, res) => {
   }
 });
 
+// Delete a match by id
+router.patch('/api/users/unmatch/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.body;
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    user.liked_users = user.liked_users.filter((likedUser) => String(likedUser) !== userId);
+    await user.save();
+
+    res.status(200).json({ message: 'User unliked successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+
 
 
 

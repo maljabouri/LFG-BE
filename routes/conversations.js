@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Conversation = require('../models/conversation');
 
-// Get a conversation by user IDs
-// Get a conversation by user IDs
+// Get a conversation by its ID
 router.get('/api/conversations/:id', async (req, res) => {
   try {
     const conversation = await Conversation.findById(req.params.id).populate('user1 user2 messages');
