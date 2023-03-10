@@ -31,29 +31,34 @@ router.get('/api/conversations', async (req, res) => {
 
 
 
-// Create a new conversation between two users
+// Create a new conversation with the matched user
 router.post('/api/conversations', async (req, res) => {
-  const { user1, user2 } = req.body;
+  const { members } = req.body;
 
   try {
-    // Check if conversation already exists
-    const existingConversation = await Conversation.findOne({ $or: [{ user1, user2 }, { user1: user2, user2: user1 }] });
-    if (existingConversation) {
-      return res.status(400).json({ message: 'Conversation already exists' });
-    }
-
-    const conversation = new Conversation({
-      user1,
-      user2
+    // Check if a conversation with these members already exists
+    const existingConversation = await Conversation.findOne({
+      members: { $all: members },
     });
 
-    await conversation.save();
+    if (existingConversation) {
+      return res.status(400).json({ error: 'Conversation already exists' });
+    }
 
-    res.json(conversation);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server Error' });
+    // Create a new conversation with the given members
+    const newConversation = new Conversation({
+      members,
+    });
+    await newConversation.save();
+
+    res.status(201).json(newConversation);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
 module.exports = router;
+
+
+
