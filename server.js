@@ -16,9 +16,9 @@ mongoose.connection.once('open', () => console.log('Connected to MongoDB-LFG'))
 
 //Require Route Files
 const usersRouter = require('./routes/users.js')
-const Match = require('./models/match.js')
-const Conversation = require('./models/conversation.js')
-const Message = require('./models/message.js')
+const matchRouter = require('./routes/matches.js')
+const conversationRouter = require('./routes/conversations.js')
+const messageRouter = require('./routes/messages.js')
 
 // Instantiate express server object 
 const app = express()
@@ -41,23 +41,11 @@ app.use(cors({ origin: process.env.CLIENT_ORIGIN || `http://localhost:${reactPor
 */
 // app.use(indexRouter);
 app.use(usersRouter);
-// app.use(postRouter)
+app.use(matchRouter)
+app.use(conversationRouter)
+app.use(messageRouter)
 
-// const newUser = new User({
-//   name: "Nick Black",
-//   email: "johndoe@example.com",
-//   password: "password",
-//   username: "NickB93",
-//   server: ['EU'],
-//   roles: ["dps"],
-//   content: ["dungeon"],
-// });
 
-// newUser.save().then(() => {
-//   console.log('User created successfully!');
-// }).catch((error) => {
-//   console.error('Failed to create user:', error);
-// });
 
 
 // Ensuring the server is listening to the port

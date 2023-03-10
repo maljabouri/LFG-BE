@@ -206,6 +206,36 @@ router.get('/api/users/search/:id', async (req, res) => {
 
 
 
+// Like a user
+router.post('/api/users/:id/like', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.body;
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const likedUser = await User.findById(userId);
+    if (!likedUser) {
+      return res.status(404).json({ error: 'Liked user not found' });
+    }
+
+    if (user.liked_users.includes(userId)) {
+      return res.status(400).json({ error: 'User has already liked this user' });
+    }
+
+    user.liked_users.push(likedUser._id);
+    await user.save();
+
+    res.status(200).json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 
 
 module.exports = router;

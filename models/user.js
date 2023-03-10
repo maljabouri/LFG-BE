@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
     ref: 'Match'
   }],
   liked_users: [{
-    type: mongoose.Schema.types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }]
 });
